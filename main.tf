@@ -34,7 +34,7 @@ module "autoscaling" {
   version = "6.9.0"
   
   name     = "blog"
-  min_size = 1
+  min_size = 0
   max_size = 2
 
   vpc_zone_identifier = module.blog_vpc.public_subnets
