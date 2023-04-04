@@ -14,6 +14,33 @@ data "aws_ami" "app_ami" {
   owners = ["979382823631"] # Bitnami
 }
 
+resource "aws_iam_policy" "asg_alb_policy" {
+  name        = "asg-alb-policy"
+  description = "Policy allowing the Autoscaling service role to interact with the ALB"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "elasticloadbalancing:RegisterTargets",
+          "elasticloadbalancing:DeregisterTargets",
+          "elasticloadbalancing:DescribeTargetGroups",
+          "elasticloadbalancing:DescribeTargetHealth",
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "asg_alb_attachment" {
+  policy_arn = aws_iam_policy.asg_alb_policy.arn
+  role       = "arn:aws:iam::151433041472:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+}
+
+
 module "blog_vpc" {
   source = "terraform-aws-modules/vpc/aws"
 
